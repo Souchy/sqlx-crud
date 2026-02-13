@@ -73,7 +73,7 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         config.named.iter().count() - 1
     };
     let insert_sql_binds = (0..insert_bind_cnt)
-        .map(|i| format!("${}", i + 1))
+        .map(|i| config.db_ty.placeholder(i + 1))
         .collect::<Vec<_>>()
         .join(", ");
 
@@ -83,7 +83,7 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         .flat_map(|f| &f.ident)
         .filter(|i| *i != &config.id_column_ident)
         .enumerate()
-        .map(|(i, ident)| format!("{} = ${}", config.quote_ident(&ident.to_string()), i + 1))
+        .map(|(i, ident)| format!("{} = {}", config.quote_ident(&ident.to_string()), config.db_ty.placeholder(i + 1)))
         .collect::<Vec<_>>();
 
     let insert_column_list = config
@@ -104,26 +104,32 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
 
     let select_sql = format!("SELECT {} FROM {}", column_list, table_name);
     let paginated_sql = format!(
-        "SELECT {} FROM {} LIMIT $1 OFFSET $2",
-        column_list, table_name
+        "SELECT {} FROM {} LIMIT {} OFFSET {}",
+        column_list,
+        table_name,
+        config.db_ty.placeholder(1),
+        config.db_ty.placeholder(2)
     );
     let select_by_id_sql = format!(
-        "SELECT {} FROM {} WHERE {} = $1 LIMIT 1",
-        column_list, table_name, id_column
+        "SELECT {} FROM {} WHERE {} = {} LIMIT 1",
+        column_list,
+        table_name,
+        id_column,
+        config.db_ty.placeholder(1)
     );
     let insert_sql = format!(
         "INSERT INTO {} ({}) VALUES ({}) RETURNING {}",
         table_name, insert_column_list, insert_sql_binds, column_list
     );
     let update_by_id_sql = format!(
-        "UPDATE {} SET {} WHERE {} = ${} RETURNING {}",
+        "UPDATE {} SET {} WHERE {} = {} RETURNING {}",
         table_name,
         update_sql_binds.join(", "),
         id_column,
-        update_sql_binds.len() + 1,
+        config.db_ty.placeholder(update_sql_binds.len() + 1),
         column_list
     );
-    let delete_by_id_sql = format!("DELETE FROM {} WHERE {} = $1", table_name, id_column);
+    let delete_by_id_sql = format!("DELETE FROM {} WHERE {} = {}", table_name, id_column, config.db_ty.placeholder(1));
 
     quote! {
         select_sql: #select_sql,
@@ -393,6 +399,17 @@ impl DbType {
             Self::MySql => format!("`{}`", &ident),
             Self::Postgres => format!(r#""{}""#, &ident),
             Self::Sqlite => format!(r#""{}""#, &ident),
+        }
+    }
+
+    // New: placeholder generation per database backend
+    fn placeholder(&self, idx: usize) -> String {
+        match self {
+            Self::Postgres => format!("${}", idx),
+            Self::Sqlite => "?".to_string(), // sqlite uses '?' positional placeholders
+            Self::MySql => "?".to_string(),  // mysql uses '?' placeholders
+            Self::Mssql => format!("@p{}", idx), // MSSQL style parameter name
+            Self::Any => format!("${}", idx),
         }
     }
 }

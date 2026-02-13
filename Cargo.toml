@@ -1,10 +1,5 @@
 [workspace]
-members = [
-  ".",
-  "sqlx-crud-macros",
-  "examples/axum",
-  "examples/serenity",
-]
+members = [".", "sqlx-crud-macros", "examples/axum", "examples/serenity"]
 
 [package]
 name = "sqlx-crud"

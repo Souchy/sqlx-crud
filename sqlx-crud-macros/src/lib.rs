@@ -9,7 +9,7 @@ use syn::{
     LitStr,
 };
 
-#[proc_macro_derive(SqlxCrud, attributes(database, external_id, id))]
+#[proc_macro_derive(SqlxCrud, attributes(database, table, external_id, id))]
 pub fn derive(input: TokenStream) -> TokenStream {
     let DeriveInput {
         ident, data, attrs, ..
@@ -73,7 +73,7 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         config.named.iter().count() - 1
     };
     let insert_sql_binds = (0..insert_bind_cnt)
-        .map(|_| "?")
+        .map(|i| format!("${}", i + 1))
         .collect::<Vec<_>>()
         .join(", ");
 
@@ -82,9 +82,9 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         .iter()
         .flat_map(|f| &f.ident)
         .filter(|i| *i != &config.id_column_ident)
-        .map(|i| format!("{} = ?", config.quote_ident(&i.to_string())))
-        .collect::<Vec<_>>()
-        .join(", ");
+        .enumerate()
+        .map(|(i, ident)| format!("{} = ${}", config.quote_ident(&ident.to_string()), i + 1))
+        .collect::<Vec<_>>();
 
     let insert_column_list = config
         .named
@@ -103,8 +103,12 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         .join(", ");
 
     let select_sql = format!("SELECT {} FROM {}", column_list, table_name);
+    let paginated_sql = format!(
+        "SELECT {} FROM {} LIMIT $1 OFFSET $2",
+        column_list, table_name
+    );
     let select_by_id_sql = format!(
-        "SELECT {} FROM {} WHERE {} = ? LIMIT 1",
+        "SELECT {} FROM {} WHERE {} = $1 LIMIT 1",
         column_list, table_name, id_column
     );
     let insert_sql = format!(
@@ -112,10 +116,14 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         table_name, insert_column_list, insert_sql_binds, column_list
     );
     let update_by_id_sql = format!(
-        "UPDATE {} SET {} WHERE {} = ? RETURNING {}",
-        table_name, update_sql_binds, id_column, column_list
+        "UPDATE {} SET {} WHERE {} = ${} RETURNING {}",
+        table_name,
+        update_sql_binds.join(", "),
+        id_column,
+        update_sql_binds.len() + 1,
+        column_list
     );
-    let delete_by_id_sql = format!("DELETE FROM {} WHERE {} = ?", table_name, id_column);
+    let delete_by_id_sql = format!("DELETE FROM {} WHERE {} = $1", table_name, id_column);
 
     quote! {
         select_sql: #select_sql,
@@ -123,6 +131,7 @@ fn build_sql_queries(config: &Config) -> TokenStream2 {
         insert_sql: #insert_sql,
         update_by_id_sql: #update_by_id_sql,
         delete_by_id_sql: #delete_by_id_sql,
+        paginated_sql: #paginated_sql,
     }
 }
 
@@ -209,6 +218,10 @@ fn build_sqlx_crud_impl(config: &Config) -> TokenStream2 {
             fn delete_by_id_sql() -> &'static str {
                 #model_schema_ident.delete_by_id_sql
             }
+
+            fn paginated_sql() -> &'static str {
+                #model_schema_ident.paginated_sql
+            }
         }
 
         #[automatically_derived]
@@ -228,6 +241,18 @@ fn build_sqlx_crud_impl(config: &Config) -> TokenStream2 {
                 #(#update_query_args)*
                 #update_query_args_id
                 Ok(args)
+            }
+
+            fn paginated_args(limit: i64, offset: i64) -> <#db_ty as ::sqlx::database::Database>::Arguments<'e> {
+                use ::sqlx::Arguments as _;
+                let mut args = <#db_ty as ::sqlx::database::Database>::Arguments::default();
+                args.reserve(2usize,
+                    ::sqlx::encode::Encode::<#db_ty>::size_hint(&limit) +
+                    ::sqlx::encode::Encode::<#db_ty>::size_hint(&offset)
+                );
+                let _ = args.add(limit);
+                let _ = args.add(offset);
+                args
             }
         }
     }
@@ -261,8 +286,6 @@ impl<'a> Config<'a> {
         let model_schema_ident =
             format_ident!("{}_SCHEMA", ident.to_string().to_screaming_snake_case());
 
-        let table_name = ident.to_string().to_table_case();
-
         // Search for a field with the #[id] attribute
         let id_attr = &named
             .iter()
@@ -280,6 +303,22 @@ impl<'a> Config<'a> {
             .clone();
 
         let external_id = attrs.iter().any(|a| a.path().is_ident("external_id"));
+
+        let table_name = attrs
+            .iter()
+            .find(|a| a.path().is_ident("table"))
+            .and_then(|attr| {
+                let mut table = None;
+                attr.parse_nested_meta(|meta| {
+                    if let Some(ident) = meta.path.get_ident() {
+                        table = Some(ident.to_string());
+                    }
+                    Ok(())
+                })
+                .ok();
+                table
+            })
+            .unwrap_or_else(|| ident.to_string().to_table_case());
 
         Self {
             ident,

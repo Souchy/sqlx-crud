@@ -2,17 +2,17 @@
 members = [".", "sqlx-crud-macros", "examples/axum", "examples/serenity"]
 
 [package]
-name = "sqlx-crud"
-version = "0.5.0"
+name = "souchy-sqlx-crud"
+version = "0.1.0"
 edition = "2021"
 readme = "README.md"
-repository = "https://github.com/treydempsey/sqlx-crud"
+repository = "https://github.com/Souchy/sqlx-crud"
 documentation = "https://docs.rs/sqlx-crud"
 description = "Derive macro for SQLx to implement Create, Read, Update, and Delete (CRUD) methods for you."
 license = "MIT"
 keywords = ["sqlx", "orm", "crud", "database"]
 categories = ["database", "asynchronous", "web-programming"]
-authors = ["Trey Dempsey <trey.dempsey@gmail.com>"]
+authors = ["Trey Dempsey <trey.dempsey@gmail.com>", "Souchy <robyn.g@hotmail.fr>"]
 
 [features]
 default = ["runtime-tokio"]
@@ -24,7 +24,7 @@ tls-rustls = ["sqlx/tls-rustls"]
 [dependencies]
 futures = "0.3"
 sqlx = { version = "0.8.6" }
-sqlx-crud-macros = { version = "0.4", path = "sqlx-crud-macros" }
+souchy-sqlx-crud-macros = { version = "0.1.0", path = "sqlx-crud-macros" }
 thiserror = "2"
 
 [dev-dependencies]

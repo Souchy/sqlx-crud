@@ -1,14 +1,14 @@
 [package]
-name = "sqlx-crud-macros"
-version = "0.4.0"
+name = "souchy-sqlx-crud-macros"
+version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/treydempsey/sqlx-crud"
+repository = "https://github.com/Souchy/sqlx-crud"
 documentation = "https://docs.rs/sqlx-crud"
 description = "Proc macro implemtation for sqlx-crud to implement Create, Read, Update, and Delete (CRUD) methods on SQLx for you 🪄 📖 📝 ❌"
 license = "MIT"
 keywords = ["sqlx", "orm", "crud", "database"]
 categories = ["database", "asynchronous", "web-programming"]
-authors = ["Trey Dempsey <trey.dempsey@gmail.com>"]
+authors = ["Trey Dempsey <trey.dempsey@gmail.com>", "Souchy <robyn.g@hotmail.fr>"]
 
 [lib]
 proc-macro = true

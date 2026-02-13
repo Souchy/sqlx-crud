@@ -1,7 +1,7 @@
 use serenity::async_trait;
 use serenity::prelude::*;
 use sqlx::{FromRow, Pool, Sqlite, SqlitePool};
-use sqlx_crud::SqlxCrud;
+use souchy_sqlx_crud::SqlxCrud;
 
 struct Handler {
     db: Pool<Sqlite>,
@@ -16,7 +16,7 @@ struct User {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, _ctx: Context, _msg: serenity::model::channel::Message) {
-        use sqlx_crud::Crud;
+        use souchy_sqlx_crud::Crud;
 
         // Taken from https://github.com/treydempsey/sqlx-crud/issues/9#issuecomment-1509718232
 

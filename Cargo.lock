@@ -251,8 +251,8 @@ dependencies = [
  "axum 0.8.8",
  "serde",
  "serde_json",
+ "souchy-sqlx-crud",
  "sqlx",
- "sqlx-crud",
  "tokio",
 ]
 
@@ -1361,8 +1361,8 @@ name = "issue-9"
 version = "0.1.0"
 dependencies = [
  "serenity",
+ "souchy-sqlx-crud",
  "sqlx",
- "sqlx-crud",
  "tokio",
 ]
 
@@ -2505,6 +2505,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "souchy-sqlx-crud"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "souchy-sqlx-crud-macros",
+ "sqlx",
+ "thiserror 2.0.18",
+ "tokio-test",
+]
+
+[[package]]
+name = "souchy-sqlx-crud-macros"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.115",
+]
+
+[[package]]
 name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2573,27 +2594,6 @@ dependencies = [
  "tracing",
  "url",
  "webpki-roots 0.26.11",
-]
-
-[[package]]
-name = "sqlx-crud"
-version = "0.5.0"
-dependencies = [
- "futures",
- "sqlx",
- "sqlx-crud-macros",
- "thiserror 2.0.18",
- "tokio-test",
-]
-
-[[package]]
-name = "sqlx-crud-macros"
-version = "0.4.0"
-dependencies = [
- "Inflector",
- "proc-macro2",
- "quote",
- "syn 2.0.115",
 ]
 
 [[package]]

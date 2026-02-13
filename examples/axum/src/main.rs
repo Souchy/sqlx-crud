@@ -11,8 +11,8 @@ use serde::Serialize;
 use sqlx::sqlite::SqlitePool;
 use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::FromRow;
-use sqlx_crud::Crud;
-use sqlx_crud::SqlxCrud;
+use souchy_sqlx_crud::Crud;
+use souchy_sqlx_crud::SqlxCrud;
 
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 

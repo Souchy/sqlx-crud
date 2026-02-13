@@ -27,7 +27,7 @@ pub type TryCollectFut<'e, T> = TryCollect<CrudStream<'e, T>, Vec<T>>;
 ///
 /// ```rust
 /// use sqlx::FromRow;
-/// use sqlx_crud::SqlxCrud;
+/// use souchy_sqlx_crud::SqlxCrud;
 ///
 /// #[derive(FromRow, SqlxCrud)]
 /// pub struct User {
@@ -47,7 +47,7 @@ pub trait Schema {
     ///
     /// ```rust
     /// use sqlx::FromRow;
-    /// use sqlx_crud::{Schema, SqlxCrud};
+    /// use souchy_sqlx_crud::{Schema, SqlxCrud};
     ///
     /// #[derive(FromRow, SqlxCrud)]
     /// struct GoogleIdToken {
@@ -75,8 +75,8 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Schema;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Schema;
     ///
     /// assert_eq!(r#"SELECT "users"."user_id", "users"."name" FROM "users""#, User::select_sql());
     /// # }}
@@ -89,8 +89,8 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Schema;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Schema;
     ///
     /// assert_eq!(
     ///     r#"SELECT "users"."user_id", "users"."name" FROM "users" WHERE "users"."user_id" = ? LIMIT 1"#,
@@ -108,9 +108,9 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
     /// use sqlx::FromRow;
-    /// use sqlx_crud::{Schema, SqlxCrud};
+    /// use souchy_sqlx_crud::{Schema, SqlxCrud};
     ///
     /// #[derive(Debug, FromRow, SqlxCrud)]
     /// #[external_id]
@@ -130,8 +130,8 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Schema;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Schema;
     ///
     /// assert_eq!(r#"UPDATE "users" SET "name" = ? WHERE "users"."user_id" = ? RETURNING "users"."user_id", "users"."name""#, User::update_by_id_sql());
     /// # }}
@@ -143,8 +143,8 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Schema;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Schema;
     ///
     /// assert_eq!(r#"DELETE FROM "users" WHERE "users"."user_id" = ?"#, User::delete_by_id_sql());
     /// # }}
@@ -156,8 +156,8 @@ pub trait Schema {
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Schema;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Schema;
     ///
     /// assert_eq!(r#"SELECT "users"."user_id", "users"."name" FROM "users" LIMIT ? OFFSET ?"#, User::paginated_sql());
     /// # }}
@@ -203,8 +203,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::{Crud, Schema};
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::{Crud, Schema};
     ///
     /// let user = User { user_id: 1, name: "test".to_string() };
     /// let user = user.create(&pool).await?;
@@ -230,8 +230,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Crud;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Crud;
     ///
     /// let all_users: Vec<User> = User::all(&pool).await?;
     /// # }}
@@ -251,8 +251,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Crud;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Crud;
     ///
     /// let all_users: Vec<User> = User::paginated(&pool, 20, 0).await?;
     /// # }}
@@ -277,8 +277,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Crud;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Crud;
     ///
     /// let user: Option<User> = User::by_id(&pool, 1).await?;
     /// assert!(user.is_some());
@@ -308,8 +308,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Crud;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Crud;
     ///
     /// if let Some(mut user) = User::by_id(&pool, 1).await? {
     ///     assert_eq!("test", user.name);
@@ -341,8 +341,8 @@ where
     /// # Example
     ///
     /// ```rust
-    /// # sqlx_crud::doctest_setup! { |pool| {
-    /// use sqlx_crud::Crud;
+    /// # souchy_sqlx_crud::doctest_setup! { |pool| {
+    /// use souchy_sqlx_crud::Crud;
     ///
     /// if let Some(user) = User::by_id(&pool, 1).await? {
     ///     user.delete(&pool).await?;

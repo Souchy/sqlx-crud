@@ -51,7 +51,7 @@
 //!
 //! ```rust
 //! use sqlx::FromRow;
-//! use sqlx_crud::SqlxCrud;
+//! use souchy_sqlx_crud::SqlxCrud;
 //!
 //! #[derive(Debug, FromRow, SqlxCrud)]
 //! pub struct User {
@@ -65,8 +65,8 @@
 //! To create a new `User` in the database:
 //!
 //! ```rust
-//! # sqlx_crud::doctest_setup! { |pool| {
-//! use sqlx_crud::Crud;
+//! # souchy_sqlx_crud::doctest_setup! { |pool| {
+//! use souchy_sqlx_crud::Crud;
 //!
 //! let new_user = User { user_id: 2, name: "new_user".to_string() };
 //! new_user.create(&pool).await?;
@@ -76,8 +76,8 @@
 //! To query for a `User` where `user_id = 1`:
 //!
 //! ```rust
-//! # sqlx_crud::doctest_setup! { |pool| {
-//! use sqlx_crud::Crud;
+//! # souchy_sqlx_crud::doctest_setup! { |pool| {
+//! use souchy_sqlx_crud::Crud;
 //!
 //! if let Some(user) = User::by_id(&pool, 1).await? {
 //!     println!("User: {:?}", user);
@@ -88,8 +88,8 @@
 //!  To update an existing record:
 //!
 //!  ```rust
-//! # sqlx_crud::doctest_setup! { |pool| {
-//! use sqlx_crud::Crud;
+//! # souchy_sqlx_crud::doctest_setup! { |pool| {
+//! use souchy_sqlx_crud::Crud;
 //!
 //! if let Some(mut user) = User::by_id(&pool, 1).await? {
 //!     user.name = "something else".to_string();
@@ -101,8 +101,8 @@
 //! To delete a record:
 //!
 //! ```rust
-//! # sqlx_crud::doctest_setup! { |pool| {
-//! use sqlx_crud::Crud;
+//! # souchy_sqlx_crud::doctest_setup! { |pool| {
+//! use souchy_sqlx_crud::Crud;
 //!
 //! if let Some(mut user) = User::by_id(&pool, 1).await? {
 //!     user.delete(&pool).await?;
@@ -113,9 +113,9 @@
 //! Reusing and modifying the [select_sql] query string:
 //!
 //! ```rust
-//! # sqlx_crud::doctest_setup! { |pool| {
+//! # souchy_sqlx_crud::doctest_setup! { |pool| {
 //! use futures::stream::TryStreamExt;
-//! use sqlx_crud::{Schema, SqlxCrud};
+//! use souchy_sqlx_crud::{Schema, SqlxCrud};
 //!
 //! #[derive(Debug, FromRow, SqlxCrud)]
 //! pub struct User {
@@ -157,7 +157,7 @@
 pub mod schema;
 pub mod traits;
 
-pub use sqlx_crud_macros::SqlxCrud;
+pub use souchy_sqlx_crud_macros::SqlxCrud;
 pub use traits::{Crud, Schema};
 
 #[macro_export]
@@ -166,7 +166,7 @@ macro_rules! doctest_setup {
     (|$pool:ident| $($t:tt)*) => {
         use sqlx::FromRow;
         use sqlx::SqlitePool;
-        use sqlx_crud::SqlxCrud;
+        use souchy_sqlx_crud::SqlxCrud;
 
         #[derive(Debug, FromRow, SqlxCrud)]
         pub struct User {

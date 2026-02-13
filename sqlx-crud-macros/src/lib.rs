@@ -278,7 +278,7 @@ impl<'a> Config<'a> {
         let crate_name = if !is_doctest && crate_name == "sqlx-crud" {
             quote! { crate }
         } else {
-            quote! { ::sqlx_crud }
+            quote! { ::souchy_sqlx_crud }
         };
 
         let db_ty = DbType::new(attrs);

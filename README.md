@@ -6,7 +6,7 @@ representing a table in a sqlx database.
 
 ```rust
 use sqlx::FromRow;
-use sqlx_crud::SqlxCrud;
+use souchy_sqlx_crud::SqlxCrud;
 
 #[derive(Debug, FromRow, SqlxCrud)]
 struct User {
@@ -17,6 +17,12 @@ struct User {
 if let Some(user) = User::by_id(&pool, 42) {
     println!("Found user user_id=42: {:?}", user);
 }
+```
+
+Use this in toml to strip the prefix of the fork:
+
+```toml
+sqlx-crud = { package = "souchy-sqlx-crud", version = "0.1" }
 ```
 
 ### Notable Features

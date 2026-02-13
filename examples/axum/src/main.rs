@@ -6,7 +6,6 @@ use axum::routing;
 use axum::Extension;
 use axum::Json;
 use axum::Router;
-use axum::Server;
 use serde::Deserialize;
 use serde::Serialize;
 use sqlx::sqlite::SqlitePool;
@@ -98,7 +97,8 @@ async fn main() -> anyhow::Result<()> {
         .layer(Extension(pool));
 
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 3000);
-    Server::bind(&addr).serve(app.into_make_service()).await?;
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    axum::serve(listener, app.into_make_service()).await?;
 
     Ok(())
 }
